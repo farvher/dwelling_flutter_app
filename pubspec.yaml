@@ -26,6 +26,8 @@ dependencies:
   font_awesome_flutter: 8.5.0
   http: ^0.12.0+2
   flutter_tindercard: ^0.1.8
+  flutter_bloc: ^0.11.1
+  equatable: ^0.2.3
 
 dev_dependencies:
   flutter_test:
