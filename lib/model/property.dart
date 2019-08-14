@@ -1,15 +1,12 @@
-
-class Visitor{
-
-
-}
+import 'package:dwelling_flutter_app/model/image.dart';
+import 'package:dwelling_flutter_app/model/property_types.dart';
 
 class Property {
   var _id;
   var _title;
-  var _images = <String>[];
+  var _images = <Image>[];
   var _imagesCount;
-  var _propertyType;
+  var _propertyType = <PropertyType>[];
   var _neighborhood;
   var _zone;
   var _city;
@@ -31,14 +28,9 @@ class Property {
   var _latitude;
   var _longitude;
 
-  get id => _id;
 
-  set id(value) {
-    _id = value;
-  }
-
-  Property.fromJson(Map<String, dynamic> json):
-        _id = json['id'],
+  Property.fromJson(Map<String, dynamic> json)
+      : _id = json['id'],
         _title = json['title'],
         _description = json['description'],
         _imagesCount = json['imageCount'],
@@ -55,23 +47,19 @@ class Property {
         _admon = json['admon'],
         _floor = json['floor'],
         _latitude = json['latitude'],
-        _longitude = json['longitude']
+        _longitude = json['longitude'],
+        _images = (json['images'] as List).map((e) => Image.fromJson(e)).toList(),
+        _propertyType = (json['propertyTypes'] as List).map((e) => PropertyType.fromJson(e)).toList()
+
 
 
   ;
 
-  Map<String, dynamic> toJson() =>
-      {
+  Map<String, dynamic> toJson() => {
         'id': _id,
         'propertyTypes': [
-          {
-            'id': 1,
-            'name': 'APARTAESTUDIO'
-          },
-          {
-            'id': 2,
-            'name': 'CASA'
-          }
+          {'id': 1, 'name': 'APARTAESTUDIO'},
+          {'id': 2, 'name': 'CASA'}
         ],
         'title': _title,
         'neighborhood': {
@@ -83,29 +71,13 @@ class Property {
             'city': {
               'id': 868,
               'name': _city,
-              'country': {
-                'id': 791,
-                'name': _country
-              }
+              'country': {'id': 791, 'name': _country}
             }
           }
         },
         'description': _description,
         'imageCount': _imagesCount,
-        'images': [
-          {
-            'id': 543,
-            'title': 'IMG1',
-            'url': 'url_imagen',
-            'available': true
-          },
-          {
-            'id': 509,
-            'title': 'IMG2',
-            'url': 'url_imagen2',
-            'available': true
-          }
-        ],
+        'images': _images,
         'antiquitiy': _antiquitiy,
         'rentPrice': _rentPrice,
         'sellPrince': _sellPrince,
@@ -119,14 +91,8 @@ class Property {
         'admon': _admon,
         'floor': _floor,
         'additional': [
-          {
-            'id': 504,
-            'value': 'piscina'
-          },
-          {
-            'id': 639,
-            'value': 'Cancha de futbol'
-          }
+          {'id': 504, 'value': 'piscina'},
+          {'id': 639, 'value': 'Cancha de futbol'}
         ],
         'visitor': {
           'id': 115,
@@ -158,140 +124,14 @@ class Property {
             }
           }
         },
-        'latitude':_latitude,
+        'latitude': _latitude,
         'longitude': _longitude
       };
 
-  get title => _title;
+  get longitude => _longitude;
 
-  set title(value) {
-    _title = value;
-  }
-
-  get images => _images;
-
-  set images(value) {
-    _images = value;
-  }
-
-  get imagesCount => _imagesCount;
-
-  set imagesCount(value) {
-    _imagesCount = value;
-  }
-
-  get propertyType => _propertyType;
-
-  set propertyType(value) {
-    _propertyType = value;
-  }
-
-  get neighborhood => _neighborhood;
-
-  set neighborhood(value) {
-    _neighborhood = value;
-  }
-
-  get zone => _zone;
-
-  set zone(value) {
-    _zone = value;
-  }
-
-  get city => _city;
-
-  set city(value) {
-    _city = value;
-  }
-
-  get country => _country;
-
-  set country(value) {
-    _country = value;
-  }
-
-  get description => _description;
-
-  set description(value) {
-    _description = value;
-  }
-
-  get antiquitiy => _antiquitiy;
-
-  set antiquitiy(value) {
-    _antiquitiy = value;
-  }
-
-  get rentPrice => _rentPrice;
-
-  set rentPrice(value) {
-    _rentPrice = value;
-  }
-
-  get sellPrince => _sellPrince;
-
-  set sellPrince(value) {
-    _sellPrince = value;
-  }
-
-  get area => _area;
-
-  set area(value) {
-    _area = value;
-  }
-
-  get areaUnit => _areaUnit;
-
-  set areaUnit(value) {
-    _areaUnit = value;
-  }
-
-  get rooms => _rooms;
-
-  set rooms(value) {
-    _rooms = value;
-  }
-
-  get stratum => _stratum;
-
-  set stratum(value) {
-    _stratum = value;
-  }
-
-  get buildTime => _buildTime;
-
-  set buildTime(value) {
-    _buildTime = value;
-  }
-
-  get bathroom => _bathroom;
-
-  set bathroom(value) {
-    _bathroom = value;
-  }
-
-  get parking => _parking;
-
-  set parking(value) {
-    _parking = value;
-  }
-
-  get admon => _admon;
-
-  set admon(value) {
-    _admon = value;
-  }
-
-  get floor => _floor;
-
-  set floor(value) {
-    _floor = value;
-  }
-
-  get additional => _additional;
-
-  set additional(value) {
-    _additional = value;
+  set longitude(value) {
+    _longitude = value;
   }
 
   get latitude => _latitude;
@@ -300,21 +140,143 @@ class Property {
     _latitude = value;
   }
 
-  get longitude => _longitude;
+  get additional => _additional;
 
-  set longitude(value) {
-    _longitude = value;
+  set additional(value) {
+    _additional = value;
   }
 
+  get floor => _floor;
 
-}
+  set floor(value) {
+    _floor = value;
+  }
 
-class User {
+  get admon => _admon;
 
+  set admon(value) {
+    _admon = value;
+  }
 
-}
+  get parking => _parking;
 
-class Preferences {
+  set parking(value) {
+    _parking = value;
+  }
+
+  get bathroom => _bathroom;
+
+  set bathroom(value) {
+    _bathroom = value;
+  }
+
+  get buildTime => _buildTime;
+
+  set buildTime(value) {
+    _buildTime = value;
+  }
+
+  get stratum => _stratum;
+
+  set stratum(value) {
+    _stratum = value;
+  }
+
+  get rooms => _rooms;
+
+  set rooms(value) {
+    _rooms = value;
+  }
+
+  get areaUnit => _areaUnit;
+
+  set areaUnit(value) {
+    _areaUnit = value;
+  }
+
+  get area => _area;
+
+  set area(value) {
+    _area = value;
+  }
+
+  get sellPrince => _sellPrince;
+
+  set sellPrince(value) {
+    _sellPrince = value;
+  }
+
+  get rentPrice => _rentPrice;
+
+  set rentPrice(value) {
+    _rentPrice = value;
+  }
+
+  get antiquitiy => _antiquitiy;
+
+  set antiquitiy(value) {
+    _antiquitiy = value;
+  }
+
+  get description => _description;
+
+  set description(value) {
+    _description = value;
+  }
+
+  get country => _country;
+
+  set country(value) {
+    _country = value;
+  }
+
+  get city => _city;
+
+  set city(value) {
+    _city = value;
+  }
+
+  get zone => _zone;
+
+  set zone(value) {
+    _zone = value;
+  }
+
+  get neighborhood => _neighborhood;
+
+  set neighborhood(value) {
+    _neighborhood = value;
+  }
+
+  get propertyType => _propertyType;
+
+  set propertyType(value) {
+    _propertyType = value;
+  }
+
+  get imagesCount => _imagesCount;
+
+  set imagesCount(value) {
+    _imagesCount = value;
+  }
+
+  get images => _images;
+
+  set images(value) {
+    _images = value;
+  }
+
+  get title => _title;
+
+  set title(value) {
+    _title = value;
+  }
+
+  get id => _id;
+
+  set id(value) {
+    _id = value;
+  }
 
 
 }

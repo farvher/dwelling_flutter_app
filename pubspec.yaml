@@ -28,6 +28,7 @@ dependencies:
   flutter_tindercard: ^0.1.8
   flutter_bloc: ^0.11.1
   equatable: ^0.2.3
+  google_maps_flutter: ^0.4.0
 
 dev_dependencies:
   flutter_test:

@@ -9,7 +9,10 @@
     <application
         android:name="io.flutter.app.FlutterApplication"
         android:label="dwelling_flutter_app"
-        android:icon="@mipmap/ic_launcher">
+        android:icon="@mipmap/ic_launcher">}
+
+        <meta-data android:name="com.google.android.geo.API_KEY"
+            android:value="AIzaSyDiDQ3WCwUr9BKay2lFkSgxCGzbA2_vWms"/>
         <activity
             android:name=".MainActivity"
             android:launchMode="singleTop"
