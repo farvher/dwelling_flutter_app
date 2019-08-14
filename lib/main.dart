@@ -9,8 +9,6 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    DwellingProvider provider = new DwellingProvider();
-    print(provider.getData());
     return MaterialApp(
       initialRoute: '/',
       title: 'Flutter Demo',
