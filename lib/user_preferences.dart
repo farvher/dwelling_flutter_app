@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 
-
-class UserPreferencesPage extends StatefulWidget{
+class UserPreferencesPage extends StatefulWidget {
   @override
   _UserPreferencesPage createState() => _UserPreferencesPage();
 }
 
-class _UserPreferencesPage extends State<UserPreferencesPage>{
+class _UserPreferencesPage extends State<UserPreferencesPage> {
   @override
   Widget build(BuildContext context) {
     return Drawer(
@@ -20,7 +19,8 @@ class _UserPreferencesPage extends State<UserPreferencesPage>{
             ),
           ),
           ListTile(
-            title: Text('Item 1'),
+            leading: Icon(Icons.home),
+            title: Text('Inicio'),
             onTap: () {
               // Update the state of the app
               // ...
@@ -29,7 +29,18 @@ class _UserPreferencesPage extends State<UserPreferencesPage>{
             },
           ),
           ListTile(
-            title: Text('Item 2'),
+            leading: Icon(Icons.device_hub),
+            title: Text('Publica gratis'),
+            onTap: () {
+              // Update the state of the app
+              // ...
+              // Then close the drawer
+              Navigator.pop(context);
+            },
+          ),
+          ListTile(
+            leading: Icon(Icons.business),
+            title: Text('Mis Inmuebles'),
             onTap: () {
               // Update the state of the app
               // ...
@@ -38,12 +49,8 @@ class _UserPreferencesPage extends State<UserPreferencesPage>{
             },
           ),
           ButtonBar(
-            children: <Widget>[
-
-
-            ],
+            children: <Widget>[],
           )
-
         ],
       ),
     );

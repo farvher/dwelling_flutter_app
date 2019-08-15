@@ -1,5 +1,5 @@
 import 'package:http/http.dart' as http;
-import 'package:dwelling_flutter_app/endpoints.dart';
+import 'package:dwelling_flutter_app/constants/endpoints.dart';
 import 'package:dwelling_flutter_app/model/property.dart';
 import 'dart:convert';
 

@@ -7,15 +7,16 @@ import 'dart:async';
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
-  Completer<GoogleMapController> _controller = Completer();
+
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
+
     return MaterialApp(
       initialRoute: '/',
-      title: 'Flutter Demo',
+      title: 'Dwelling App',
       theme: ThemeData(
-        primarySwatch: Colors.yellow,
+        primarySwatch: Colors.red,
       ),
       home: CardsHomePage(),
     );

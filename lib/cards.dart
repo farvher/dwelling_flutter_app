@@ -1,4 +1,4 @@
-import 'package:dwelling_flutter_app/provider.dart';
+import 'package:dwelling_flutter_app/services/provider.dart';
 import 'package:flutter_tindercard/flutter_tindercard.dart';
 import 'package:flutter/material.dart';
 import 'package:dwelling_flutter_app/user_preferences.dart';
@@ -16,19 +16,20 @@ class _CardsHomePageState extends State<CardsHomePage>
     with TickerProviderStateMixin {
   DwellingProvider provider = DwellingProvider();
   Future<Property> properties;
+  bool liked  = false;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static const TextStyle optionStyle =
       TextStyle(fontSize: 30, fontWeight: FontWeight.bold, color: Colors.white);
 
   Completer<GoogleMapController> _controller = Completer();
+  Widget lastImageWidget;
+  Widget lastPosition;
+
   final Set<Marker> _markers = {};
 
   static const LatLng _center = const LatLng(4.59808, -74.076044);
 
-  void _onMapCreated(GoogleMapController controller) {
-    _controller.complete(controller);
-  }
 
   @override
   Widget build(BuildContext context) {
@@ -48,11 +49,11 @@ class _CardsHomePageState extends State<CardsHomePage>
           child: Container(
               padding: EdgeInsets.all(0.0),
               height: MediaQuery.of(context).size.height * 0.8,
-              child: futureWidget())),
+              child: futureCards())),
     );
   }
 
-  Widget futureWidget() {
+  Widget futureCards() {
     return FutureBuilder<List<Property>>(
       future: provider.getData(),
       // a previously-obtained Future<String> or null
@@ -63,9 +64,7 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return Center(child: CircularProgressIndicator());
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
             return cardBuilder(snapshot.data);
@@ -92,12 +91,8 @@ class _CardsHomePageState extends State<CardsHomePage>
               children: <Widget>[
                 Stack(
                   children: <Widget>[
-                    Container(
-                        padding: EdgeInsets.all(0.0),
-                        color: Colors.white,
-                        child: Image.network(
-                            'https://metrocuadrado.blob.core.windows.net/inmuebles/674-M2485555/674-M2485555_10_h.jpg'),
-                        alignment: Alignment.topCenter),
+                    showImages(
+                        'https://metrocuadrado.blob.core.windows.net/inmuebles/674-M2485555/674-M2485555_10_h.jpg'),
                     Center(
                         child: Text(
                       data[index].title,
@@ -106,8 +101,7 @@ class _CardsHomePageState extends State<CardsHomePage>
                   ],
                 ),
                 Expanded(
-                  child: futureShowMap(),
-
+                  child: futureShowMap(data[index]),
                 )
               ],
             )),
@@ -116,10 +110,11 @@ class _CardsHomePageState extends State<CardsHomePage>
           /// Get swiping card's alignment
           if (align.x < 0) {
             print('a la derecha $details ');
+            liked = true;
             //Card is LEFT swiping
           } else if (align.x > 0) {
             print('a la izquierda $details ');
-
+            liked = false;
             //Card is RIGHT swiping
           }
         },
@@ -131,7 +126,7 @@ class _CardsHomePageState extends State<CardsHomePage>
         });
   }
 
-  Future<Widget> buildGoogleMap() async{
+  Future<Widget> buildGoogleMap(var lat, var lon) async {
     _markers.clear();
     _markers.add(Marker(
       // This marker id can be anything that uniquely identifies each marker.
@@ -143,24 +138,24 @@ class _CardsHomePageState extends State<CardsHomePage>
       ),
       icon: BitmapDescriptor.defaultMarker,
     ));
-    return GoogleMap(
-      onMapCreated: _onMapCreated, compassEnabled: false,
+    return lastPosition = GoogleMap(
+        //onMapCreated: _onMapCreated,
+        compassEnabled: false,
         myLocationEnabled: false,
-      rotateGesturesEnabled: false,
-      zoomGesturesEnabled: false,
-      scrollGesturesEnabled: false,
-      tiltGesturesEnabled: false,
-      markers: _markers,
-      initialCameraPosition: CameraPosition(
-        target: _center,
-        zoom: 15.0,
-      )
-    );
+        rotateGesturesEnabled: false,
+        zoomGesturesEnabled: false,
+        scrollGesturesEnabled: false,
+        tiltGesturesEnabled: false,
+        markers: _markers,
+        initialCameraPosition: CameraPosition(
+          target: _center,
+          zoom: 15.0,
+        ));
   }
 
-  Widget futureShowMap() {
+  Widget futureShowMap(Property p) {
     return FutureBuilder<Widget>(
-      future: buildGoogleMap(),
+      future: buildGoogleMap(p.latitude, p.longitude),
       // a previously-obtained Future<String> or null
       builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
         switch (snapshot.connectionState) {
@@ -169,9 +164,7 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
-            return Center(
-              child: CircularProgressIndicator(),
-            );
+            return Center(child: CircularProgressIndicator(),);
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
             return snapshot.data;
@@ -181,5 +174,32 @@ class _CardsHomePageState extends State<CardsHomePage>
     );
   }
 
+  Future<Widget> buildImages(String url) async {
+    return Container(
+        padding: EdgeInsets.all(0.0),
+        color: Colors.white,
+        child: lastImageWidget = Image.network(url),
+        alignment: Alignment.topCenter);
+  }
 
+  Widget showImages(String url) {
+    return FutureBuilder<Widget>(
+      future: buildImages(url),
+      // a previously-obtained Future<String> or null
+      builder: (BuildContext context, AsyncSnapshot<Widget> snapshot) {
+        switch (snapshot.connectionState) {
+          case ConnectionState.none:
+            return Text('Press button to start.');
+          case ConnectionState.active:
+            return Text('Connecion active');
+          case ConnectionState.waiting:
+            return lastImageWidget;
+          case ConnectionState.done:
+            if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+            return snapshot.data;
+        }
+        return null; // unreachable
+      },
+    );
+  }
 }

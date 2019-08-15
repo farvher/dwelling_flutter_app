@@ -1,5 +1,7 @@
 import 'package:flutter/material.dart';
 
+import 'favorites.dart';
+
 class NavigationBar extends StatefulWidget {
   @override
   _NavigationBar createState() => _NavigationBar();
@@ -12,6 +14,12 @@ class _NavigationBar extends State<NavigationBar> {
     setState(() {
       _selectedIndex = index;
     });
+    if (index == 1) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(builder: (context) => Favorites()),
+      );
+    }
   }
 
   @override
