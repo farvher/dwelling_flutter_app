@@ -16,7 +16,11 @@ class _CardsHomePageState extends State<CardsHomePage>
     with TickerProviderStateMixin {
   DwellingProvider provider = DwellingProvider();
   Future<Property> properties;
-  bool liked  = false;
+  bool liked = false;
+  bool showMap = false;
+  List<Property> data = <Property>[];
+  var totalNum = 5;
+  var actualCard = 0;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static const TextStyle optionStyle =
@@ -30,14 +34,15 @@ class _CardsHomePageState extends State<CardsHomePage>
 
   static const LatLng _center = const LatLng(4.59808, -74.076044);
 
-
   @override
   Widget build(BuildContext context) {
     return new Scaffold(
       key: _scaffoldKey,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-          // Add your onPressed code here!
+         setState(() {
+           showMap = false;
+         });
         },
         child: Icon(Icons.favorite),
         backgroundColor: Colors.pink,
@@ -46,16 +51,17 @@ class _CardsHomePageState extends State<CardsHomePage>
       bottomNavigationBar: NavigationBar(),
       drawer: UserPreferencesPage(),
       body: new Center(
+          //centra la seccion de cartas
           child: Container(
               padding: EdgeInsets.all(0.0),
-              height: MediaQuery.of(context).size.height * 0.8,
-              child: futureCards())),
+              height: MediaQuery.of(context).size.height ,
+              child: data.isEmpty ? futureCards() : cardBuilder(data) )),
     );
   }
 
   Widget futureCards() {
     return FutureBuilder<List<Property>>(
-      future: provider.getData(),
+      future: provider.getData() ,
       // a previously-obtained Future<String> or null
       builder: (BuildContext context, AsyncSnapshot<List<Property>> snapshot) {
         switch (snapshot.connectionState) {
@@ -67,6 +73,7 @@ class _CardsHomePageState extends State<CardsHomePage>
             return Center(child: CircularProgressIndicator());
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+            data = snapshot.data;
             return cardBuilder(snapshot.data);
         }
         return null; // unreachable
@@ -77,49 +84,93 @@ class _CardsHomePageState extends State<CardsHomePage>
   Widget cardBuilder(List<Property> data) {
     return new TinderSwapCard(
         orientation: AmassOrientation.BOTTOM,
-        totalNum: 5,
-        stackNum: 3,
-        swipeEdge: 2.0,
-        maxWidth: MediaQuery.of(context).size.width,
+        totalNum: totalNum,
+        stackNum: 5,
+        swipeEdge: 6.0,
+        maxWidth: MediaQuery.of(context).size.width * 0.7,
         minWidth: MediaQuery.of(context).size.width * 0.8,
         maxHeight: MediaQuery.of(context).size.height * 0.8,
         minHeight: MediaQuery.of(context).size.height * 0.7,
-        cardBuilder: (context, index) => Card(
-                child: Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              mainAxisSize: MainAxisSize.max,
-              children: <Widget>[
-                Stack(
+        cardBuilder: (context, index) {
+          var p = data[index];
+          return Card(
+              child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Stack(
+                children: <Widget>[
+                  showImages(
+                      'https://metrocuadrado.blob.core.windows.net/inmuebles/674-M2485555/674-M2485555_10_h.jpg'),
+                  Center(
+                      child: Text(
+                    p.title,
+                    style: optionStyle,
+                  )),
+                ],
+              ),
+              Expanded(
+                  child: showMap  ? futureShowMap(data[index]) : Row(children: <Widget>[
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
                   children: <Widget>[
-                    showImages(
-                        'https://metrocuadrado.blob.core.windows.net/inmuebles/674-M2485555/674-M2485555_10_h.jpg'),
-                    Center(
-                        child: Text(
-                      data[index].title,
-                      style: optionStyle,
-                    )),
+                    Expanded(
+                        child: FlatButton.icon(
+                            icon: Icon(Icons.business),
+                            label: Text(p.propertyType[0].toString()))),
+                    FlatButton(onPressed: (){ setState(() {
+                      showMap = !showMap;
+                    });},child: Text("Mapa"),)
                   ],
                 ),
-                Expanded(
-                  child: futureShowMap(data[index]),
-                )
-              ],
-            )),
+                Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  mainAxisSize: MainAxisSize.max,
+                  children: <Widget>[
+                    Expanded(
+                        child: FlatButton.icon(
+                            icon: Icon(Icons.room),
+                            label: Text(p.rooms.toString()))),
+                    Expanded(
+                      child: FlatButton.icon(
+                          icon: Icon(Icons.local_parking),
+                          label: Text(p.parking.toString())),
+                    ),
+                    Expanded(
+                      child: FlatButton.icon(
+                          icon: Icon(Icons.crop_square),
+                          label: Text(p.area.toString())),
+                    )
+                  ],
+                ),
+                Column(
+                  children: <Widget>[],
+                ),
+              ]) //futureShowMap(data[index]),
+                  )
+            ],
+          ));
+        },
         cardController: new CardController(),
         swipeUpdateCallback: (DragUpdateDetails details, Alignment align) {
           /// Get swiping card's alignment
           if (align.x < 0) {
-            print('a la derecha $details ');
             liked = true;
             //Card is LEFT swiping
           } else if (align.x > 0) {
-            print('a la izquierda $details ');
             liked = false;
             //Card is RIGHT swiping
           }
         },
         animDuration: 200,
         swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {
+          actualCard = index;
+          if(index+1 == totalNum){
+            setState(() {
+              data.clear();
+            });
+          }
           print('movido $index $orientation');
 
           /// Get orientation & index of swiped card!
@@ -164,7 +215,9 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
-            return Center(child: CircularProgressIndicator(),);
+            return Center(
+              child: CircularProgressIndicator(),
+            );
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
             return snapshot.data;
@@ -202,4 +255,5 @@ class _CardsHomePageState extends State<CardsHomePage>
       },
     );
   }
+
 }

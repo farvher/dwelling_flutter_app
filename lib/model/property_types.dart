@@ -7,4 +7,11 @@ class PropertyType {
   PropertyType.fromJson(Map<String, dynamic> json)
       : _id = json['id'],
         _name = json['name'];
+
+  @override
+  String toString() {
+    return _name;
+  }
+
+
 }

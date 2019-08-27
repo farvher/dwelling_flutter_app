@@ -46,8 +46,8 @@ class Property {
         _parking = json['parking'],
         _admon = json['admon'],
         _floor = json['floor'],
-        _latitude = json['latitude'],
-        _longitude = json['longitude'],
+     //   _latitude = json['location'],
+       // _longitude = json['location'],
         _images = (json['images'] as List).map((e) => Image.fromJson(e)).toList(),
         _propertyType = (json['propertyTypes'] as List).map((e) => PropertyType.fromJson(e)).toList()
 
