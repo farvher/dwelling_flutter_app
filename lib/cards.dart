@@ -19,8 +19,11 @@ class _CardsHomePageState extends State<CardsHomePage>
   bool liked = false;
   bool showMap = false;
   List<Property> data = <Property>[];
-  var totalNum = 5;
+  List<Property> oldData = <Property>[];
+  var totalNum = 3;
   var actualCard = 0;
+  Property lastCard;
+  Property firstCard;
 
   final GlobalKey<ScaffoldState> _scaffoldKey = new GlobalKey<ScaffoldState>();
   static const TextStyle optionStyle =
@@ -70,7 +73,7 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
-            return Center(child: CircularProgressIndicator());
+            return Center(child:  CircularProgressIndicator());
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
             data = snapshot.data;
@@ -87,70 +90,13 @@ class _CardsHomePageState extends State<CardsHomePage>
         totalNum: totalNum,
         stackNum: 5,
         swipeEdge: 6.0,
-        maxWidth: MediaQuery.of(context).size.width * 0.7,
+        maxWidth: MediaQuery.of(context).size.width,
         minWidth: MediaQuery.of(context).size.width * 0.8,
         maxHeight: MediaQuery.of(context).size.height * 0.8,
         minHeight: MediaQuery.of(context).size.height * 0.7,
         cardBuilder: (context, index) {
           var p = data[index];
-          return Card(
-              child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Stack(
-                children: <Widget>[
-                  showImages(
-                      'https://metrocuadrado.blob.core.windows.net/inmuebles/674-M2485555/674-M2485555_10_h.jpg'),
-                  Center(
-                      child: Text(
-                    p.title,
-                    style: optionStyle,
-                  )),
-                ],
-              ),
-              Expanded(
-                  child: showMap  ? futureShowMap(data[index]) : Row(children: <Widget>[
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Expanded(
-                        child: FlatButton.icon(
-                            icon: Icon(Icons.business),
-                            label: Text(p.propertyType[0].toString()))),
-                    FlatButton(onPressed: (){ setState(() {
-                      showMap = !showMap;
-                    });},child: Text("Mapa"),)
-                  ],
-                ),
-                Column(
-                  crossAxisAlignment: CrossAxisAlignment.start,
-                  mainAxisSize: MainAxisSize.max,
-                  children: <Widget>[
-                    Expanded(
-                        child: FlatButton.icon(
-                            icon: Icon(Icons.room),
-                            label: Text(p.rooms.toString()))),
-                    Expanded(
-                      child: FlatButton.icon(
-                          icon: Icon(Icons.local_parking),
-                          label: Text(p.parking.toString())),
-                    ),
-                    Expanded(
-                      child: FlatButton.icon(
-                          icon: Icon(Icons.crop_square),
-                          label: Text(p.area.toString())),
-                    )
-                  ],
-                ),
-                Column(
-                  children: <Widget>[],
-                ),
-              ]) //futureShowMap(data[index]),
-                  )
-            ],
-          ));
+          return createCard(p);
         },
         cardController: new CardController(),
         swipeUpdateCallback: (DragUpdateDetails details, Alignment align) {
@@ -167,14 +113,84 @@ class _CardsHomePageState extends State<CardsHomePage>
         swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {
           actualCard = index;
           if(index+1 == totalNum){
+            print("[cardBuilder] ultima carta mostrada");
             setState(() {
-              data.clear();
+              //data  es igual a la nueva data consultada
             });
           }
           print('movido $index $orientation');
+          if(index+2 == totalNum ){
+            //setea a data la nueva info
+            print("[cardBuilder] cargando nueva data");
+            futureCards();
+          }
 
           /// Get orientation & index of swiped card!
         });
+  }
+
+  /**
+   * crea la carta*/
+  Card createCard(Property p) {
+    print("[createCard] $p");
+    return Card(
+        child: Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      mainAxisSize: MainAxisSize.max,
+      children: <Widget>[
+        Stack(
+          children: <Widget>[
+            showImages(
+                'https://metrocuadrado.blob.core.windows.net/inmuebles/674-M2485555/674-M2485555_10_h.jpg'),
+            Center(
+                child: Text(
+              p.title,
+              style: optionStyle,
+            )),
+          ],
+        ),
+        Expanded(
+            child: showMap  ? futureShowMap(p) : Row(children: <Widget>[
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                  child: FlatButton.icon(
+                      icon: Icon(Icons.business),
+                      label: Text(p.propertyType[0].toString()))),
+              FlatButton(onPressed: (){ setState(() {
+                showMap = !showMap;
+              });},child: Text("Mapa"),)
+            ],
+          ),
+          Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.max,
+            children: <Widget>[
+              Expanded(
+                  child: FlatButton.icon(
+                      icon: Icon(Icons.room),
+                      label: Text(p.rooms.toString()))),
+              Expanded(
+                child: FlatButton.icon(
+                    icon: Icon(Icons.local_parking),
+                    label: Text(p.parking.toString())),
+              ),
+              Expanded(
+                child: FlatButton.icon(
+                    icon: Icon(Icons.crop_square),
+                    label: Text(p.area.toString())),
+              )
+            ],
+          ),
+          Column(
+            children: <Widget>[],
+          ),
+        ]) //futureShowMap(data[index]),
+            )
+      ],
+    ));
   }
 
   Future<Widget> buildGoogleMap(var lat, var lon) async {
@@ -204,7 +220,11 @@ class _CardsHomePageState extends State<CardsHomePage>
         ));
   }
 
+  /**
+   * carga el mapa mientra muestra un circularprogress
+   * */
   Widget futureShowMap(Property p) {
+    print("[futureShowMap]");
     return FutureBuilder<Widget>(
       future: buildGoogleMap(p.latitude, p.longitude),
       // a previously-obtained Future<String> or null
@@ -215,11 +235,13 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
+            print("[futureShowMap] waiting");
             return Center(
               child: CircularProgressIndicator(),
             );
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+            print("[futureShowMap] ok");
             return snapshot.data;
         }
         return null; // unreachable
@@ -235,7 +257,10 @@ class _CardsHomePageState extends State<CardsHomePage>
         alignment: Alignment.topCenter);
   }
 
+  /**
+   *  carga una imagen de url, mientras muestra la mas reciente*/
   Widget showImages(String url) {
+    print("[showImages]");
     return FutureBuilder<Widget>(
       future: buildImages(url),
       // a previously-obtained Future<String> or null
@@ -246,9 +271,11 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
+            print("[showImages] waiting");
             return lastImageWidget;
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
+            print("[showImages] ok");
             return snapshot.data;
         }
         return null; // unreachable
