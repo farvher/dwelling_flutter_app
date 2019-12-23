@@ -1,12 +1,16 @@
+
+
+import 'package:dwelling_flutter_app/Login/login.dart';
+import 'package:dwelling_flutter_app/model/user.dart';
 import 'package:flutter/material.dart';
 import 'package:dwelling_flutter_app/cards.dart';
-import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'dart:async';
+
 
 
 void main() => runApp(MyApp());
 
 class MyApp extends StatelessWidget {
+  User user = User("","");
 
   // This widget is the root of your application.
   @override
@@ -18,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: CardsHomePage(),
+      home: user.token ==null ?  LoginPage() : CardsHomePage(),
     );
   }
 

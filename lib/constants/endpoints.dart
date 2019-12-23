@@ -6,4 +6,9 @@ class Endpoints {
   static final String PROPERTY_SEARCH = "$END_POINT/search";
   static final String FAVORITES = "$END_POINT/favorites";
   static final String VISITOR = "$END_POINT/visitor/get-user";
+  static final String INIT_RESULTS = "$END_POINT/test/search";
+
+  static final String LOGIN = "$END_POINT/auth";
+  static final String USER_INFO = "$END_POINT/user";
+
 }

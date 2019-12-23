@@ -4,7 +4,6 @@ import 'package:dwelling_flutter_app/model/property.dart';
 import 'dart:convert';
 
 class DwellingProvider {
-  DwellingProvider();
 
   Future<List<Property>> getData() async {
     var res = await http.get(Endpoints.INIT_RESULTS);

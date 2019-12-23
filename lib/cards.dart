@@ -1,4 +1,4 @@
-import 'package:dwelling_flutter_app/services/provider.dart';
+import 'package:dwelling_flutter_app/services/dwellingProvider.dart';
 import 'package:flutter_tindercard/flutter_tindercard.dart';
 import 'package:flutter/material.dart';
 import 'package:dwelling_flutter_app/user_preferences.dart';
@@ -15,13 +15,10 @@ class CardsHomePage extends StatefulWidget {
 class _CardsHomePageState extends State<CardsHomePage>
     with TickerProviderStateMixin {
   DwellingProvider provider = DwellingProvider();
-  Future<Property> properties;
   bool liked = false;
   bool showMap = false;
   List<Property> data = <Property>[];
-  List<Property> oldData = <Property>[];
   var totalNum = 3;
-  var actualCard = 0;
   Property lastCard;
   Property firstCard;
 
@@ -43,9 +40,9 @@ class _CardsHomePageState extends State<CardsHomePage>
       key: _scaffoldKey,
       floatingActionButton: FloatingActionButton(
         onPressed: () {
-         setState(() {
-           showMap = false;
-         });
+          setState(() {
+            showMap = false;
+          });
         },
         child: Icon(Icons.favorite),
         backgroundColor: Colors.pink,
@@ -57,14 +54,14 @@ class _CardsHomePageState extends State<CardsHomePage>
           //centra la seccion de cartas
           child: Container(
               padding: EdgeInsets.all(0.0),
-              height: MediaQuery.of(context).size.height ,
-              child: data.isEmpty ? futureCards() : cardBuilder(data) )),
-    );
+              height: MediaQuery.of(context).size.height,
+              child:  futureCards()),
+    ));
   }
 
   Widget futureCards() {
     return FutureBuilder<List<Property>>(
-      future: provider.getData() ,
+      future: provider.getData(),
       // a previously-obtained Future<String> or null
       builder: (BuildContext context, AsyncSnapshot<List<Property>> snapshot) {
         switch (snapshot.connectionState) {
@@ -73,7 +70,7 @@ class _CardsHomePageState extends State<CardsHomePage>
           case ConnectionState.active:
             return Text('Connecion active');
           case ConnectionState.waiting:
-            return Center(child:  CircularProgressIndicator());
+            return Center(child: CircularProgressIndicator());
           case ConnectionState.done:
             if (snapshot.hasError) return Text('Error: ${snapshot.error}');
             data = snapshot.data;
@@ -85,9 +82,10 @@ class _CardsHomePageState extends State<CardsHomePage>
   }
 
   Widget cardBuilder(List<Property> data) {
+    totalNum = data.length;
     return new TinderSwapCard(
         orientation: AmassOrientation.BOTTOM,
-        totalNum: totalNum,
+        totalNum: data.length,
         stackNum: 5,
         swipeEdge: 6.0,
         maxWidth: MediaQuery.of(context).size.width,
@@ -101,28 +99,26 @@ class _CardsHomePageState extends State<CardsHomePage>
         cardController: new CardController(),
         swipeUpdateCallback: (DragUpdateDetails details, Alignment align) {
           /// Get swiping card's alignment
-          if (align.x < 0) {
-            liked = true;
-            //Card is LEFT swiping
-          } else if (align.x > 0) {
-            liked = false;
-            //Card is RIGHT swiping
-          }
+
         },
         animDuration: 200,
         swipeCompleteCallback: (CardSwipeOrientation orientation, int index) {
-          actualCard = index;
-          if(index+1 == totalNum){
+          if (index + 1 == totalNum) {
             print("[cardBuilder] ultima carta mostrada");
             setState(() {
               //data  es igual a la nueva data consultada
             });
           }
           print('movido $index $orientation');
-          if(index+2 == totalNum ){
+          if (index + 2 == totalNum) {
             //setea a data la nueva info
             print("[cardBuilder] cargando nueva data");
-            futureCards();
+           // futureCards();
+          }
+          if (CardSwipeOrientation.LEFT == orientation){
+            liked = false;
+          }else if (CardSwipeOrientation.RIGHT == orientation){
+            liked = true;
           }
 
           /// Get orientation & index of swiped card!
@@ -132,7 +128,7 @@ class _CardsHomePageState extends State<CardsHomePage>
   /**
    * crea la carta*/
   Card createCard(Property p) {
-    print("[createCard] $p");
+    print("[createCard] $p.title ");
     return Card(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -150,44 +146,51 @@ class _CardsHomePageState extends State<CardsHomePage>
           ],
         ),
         Expanded(
-            child: showMap  ? futureShowMap(p) : Row(children: <Widget>[
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                  child: FlatButton.icon(
-                      icon: Icon(Icons.business),
-                      label: Text(p.propertyType[0].toString()))),
-              FlatButton(onPressed: (){ setState(() {
-                showMap = !showMap;
-              });},child: Text("Mapa"),)
-            ],
-          ),
-          Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.max,
-            children: <Widget>[
-              Expanded(
-                  child: FlatButton.icon(
-                      icon: Icon(Icons.room),
-                      label: Text(p.rooms.toString()))),
-              Expanded(
-                child: FlatButton.icon(
-                    icon: Icon(Icons.local_parking),
-                    label: Text(p.parking.toString())),
-              ),
-              Expanded(
-                child: FlatButton.icon(
-                    icon: Icon(Icons.crop_square),
-                    label: Text(p.area.toString())),
-              )
-            ],
-          ),
-          Column(
-            children: <Widget>[],
-          ),
-        ]) //futureShowMap(data[index]),
+            child: showMap
+                ? futureShowMap(p)
+                : Row(children: <Widget>[
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Expanded(
+                            child: FlatButton.icon(
+                                icon: Icon(Icons.business),
+                                label: Text(p.propertyType[0].toString()))),
+                        FlatButton(
+                          onPressed: () {
+                            setState(() {
+                              showMap = !showMap;
+                            });
+                          },
+                          child: Text("Mapa"),
+                        )
+                      ],
+                    ),
+                    Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      mainAxisSize: MainAxisSize.max,
+                      children: <Widget>[
+                        Expanded(
+                            child: FlatButton.icon(
+                                icon: Icon(Icons.room),
+                                label: Text(p.rooms.toString()))),
+                        Expanded(
+                          child: FlatButton.icon(
+                              icon: Icon(Icons.local_parking),
+                              label: Text(p.parking.toString())),
+                        ),
+                        Expanded(
+                          child: FlatButton.icon(
+                              icon: Icon(Icons.crop_square),
+                              label: Text(p.area.toString())),
+                        )
+                      ],
+                    ),
+                    Column(
+                      children: <Widget>[],
+                    ),
+                  ]) //futureShowMap(data[index]),
             )
       ],
     ));
@@ -282,5 +285,4 @@ class _CardsHomePageState extends State<CardsHomePage>
       },
     );
   }
-
 }
