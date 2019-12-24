@@ -22,7 +22,7 @@ class MyApp extends StatelessWidget {
       theme: ThemeData(
         primarySwatch: Colors.red,
       ),
-      home: user.token ==null ?  LoginPage() : CardsHomePage(),
+      home:  CardsHomePage(),
     );
   }
 

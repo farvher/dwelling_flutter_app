@@ -15,18 +15,15 @@ class _FormPageState extends State<LoginPage> {
   String _username;
   String _password;
 
-  void _submit() {
+  void _submit() async {
     final form = formKey.currentState;
 
     if (form.validate()) {
       form.save();
-
       User user = User(_username, _password);
-      _auth(user);
-      final snackbar = new SnackBar(
-        content: new Text(user.token),
-      );
-      scaffoldKey.currentState.showSnackBar(snackbar);
+      await loginProvider.auth(user).then(
+              (res) => {
+      });
     }
   }
 
@@ -39,13 +36,8 @@ class _FormPageState extends State<LoginPage> {
 
   @override
   Widget build(BuildContext context) {
-    return new Scaffold(
-        key: scaffoldKey,
-        appBar: new AppBar(
-          title: new Text("Form Page"),
-        ),
-        body: new Padding(
-          padding: const EdgeInsets.all(0.0),
+    return  new Padding(
+          padding: const EdgeInsets.all(20.0),
           child: new Form(
             key: formKey,
             child: new Column(
@@ -70,7 +62,7 @@ class _FormPageState extends State<LoginPage> {
               ],
             ),
           ),
-        ));
+        );
   }
 
   _auth(User user) async {
