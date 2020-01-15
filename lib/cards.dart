@@ -128,7 +128,6 @@ class _CardsHomePageState extends State<CardsHomePage>
   /**
    * crea la carta*/
   Card createCard(Property p) {
-    print("[createCard] $p.title ");
     return Card(
         child: Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -156,7 +155,7 @@ class _CardsHomePageState extends State<CardsHomePage>
                         Expanded(
                             child: FlatButton.icon(
                                 icon: Icon(Icons.business),
-                                label: Text(p.propertyType[0].toString()))),
+                                label: Text(p.propertyType.toString()))),
                         FlatButton(
                           onPressed: () {
                             setState(() {

@@ -6,7 +6,8 @@ class Property {
   var _title;
   var _images = <Image>[];
   var _imagesCount;
-  var _propertyType = <PropertyType>[];
+  var _propertyType;
+  var _businessType;
   var _neighborhood;
   var _zone;
   var _city;
@@ -46,10 +47,11 @@ class Property {
         _parking = json['parking'],
         _admon = json['admon'],
         _floor = json['floor'],
-     //   _latitude = json['location'],
-       // _longitude = json['location'],
+        _latitude = json['location']['lat'],
+        _longitude = json['location']['lon'],
         _images = (json['images'] as List).map((e) => Image.fromJson(e)).toList(),
-        _propertyType = (json['propertyTypes'] as List).map((e) => PropertyType.fromJson(e)).toList()
+        _propertyType = json['propertyType'],
+        _businessType = json['businessType']
 
 
 
@@ -57,10 +59,8 @@ class Property {
 
   Map<String, dynamic> toJson() => {
         'id': _id,
-        'propertyTypes': [
-          {'id': 1, 'name': 'APARTAESTUDIO'},
-          {'id': 2, 'name': 'CASA'}
-        ],
+        'propertyType': _propertyType,
+        'businessType': _businessType,
         'title': _title,
         'neighborhood': {
           'id': 740,
@@ -127,6 +127,13 @@ class Property {
         'latitude': _latitude,
         'longitude': _longitude
       };
+
+
+  get businessType => _businessType;
+
+  set businessType(value) {
+    _businessType = value;
+  }
 
   get longitude => _longitude;
 
