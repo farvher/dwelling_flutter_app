@@ -20,8 +20,7 @@ class MyApp extends StatelessWidget {
       initialRoute: '/',
       title: 'Dwelling App',
       theme: ThemeData(
-        primarySwatch: Colors.blue,
-        backgroundColor: Colors.red
+        primarySwatch: Colors.blue
       ),
       home:  CardsHomePage(),
     );
